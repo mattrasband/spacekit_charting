@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ArduSat SpaceKit Demo</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/chart.js"></script>
+        <script>
+var data = {
+    labels: [],
+    datasets: [
+        {
+            label: "IR Temp",
+            fillColor: "rgba(220,220,220,0.0)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: []
+        },
+        {
+            label: "Analog Temp",
+            fillColor: "rgba(151,187,205,0.0)",
+            strokeColor: "rgba(151,187,205,1)",
+            pointColor: "rgba(151,187,205,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(151,187,205,1)",
+            data: []
+        }
+   ]
+};
+var myLineChart;
+
+setTimeout(function() {
+    var ctx = document.getElementById('myChart').getContext('2d');
+    myLineChart = new Chart(ctx).Line(data, {
+        bezierCurve: false,
+        scaleBeginAtZero: true,
+        animation: false,
+        legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].pointColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+    });
+    document.getElementById('legend').innerHTML = myLineChart.generateLegend();
+}, 1000);
+
+var socket = io();
+socket.on('sensorReport', function(report) {
+    myLineChart.addData([report.tmpIR, report.tmp102], '');
+});
+        </script>
+    </head>
+    <body style="margin: 0; padding: 0;">
+        <canvas id="myChart" style="width: 640px; height: 480px;"></canvas>
+        <div id="legend"></div>
+    </body>
+</html>
